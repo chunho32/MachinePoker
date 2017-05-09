@@ -7,6 +7,7 @@ binions = require 'binions'
 exports.seats =
   JsLocal: require('./seats/js_local')
   Remote: require('./seats/remote')
+  SocketSeat : require('./seats/socketSeat')
 
 exports.betting = binions.betting
 exports.observers =
@@ -30,7 +31,7 @@ class MachinePoker extends EventEmitter
   addObserver: (obs) ->
     @observers.push(obs)
     for event in ['roundStart', 'stateChange', 'complete', 'tournamentComplete', 'betAction']
-      @on(event, obs[event]) if obs[event]
+      @on(event, obs[event].bind(obs)) if obs[event]
 
   addPlayers: (bots) ->
     names = []
