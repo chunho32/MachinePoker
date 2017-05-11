@@ -17,7 +17,7 @@
     "coffee-script": ">=1.4.0"
   },
   "dependencies": {
-    "binions": ">=0.6.4",
+    "binions": "git+https://github.com/chunho32/binions.git",
     "hoyle": ">=0.2.0",
     "async": ">=0.1.22",
     "request": ">=2.11.4",
