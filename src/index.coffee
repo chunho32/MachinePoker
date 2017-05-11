@@ -30,7 +30,7 @@ class MachinePoker extends EventEmitter
 
   addObserver: (obs) ->
     @observers.push(obs)
-    for event in ['roundStart', 'stateChange', 'complete', 'tournamentComplete', 'betAction']
+    for event in ['roundStart', 'stateChange', 'complete', 'tournamentComplete', 'betAction', 'playerBetStart']
       @on(event, obs[event].bind(obs)) if obs[event]
 
   addPlayers: (bots) ->
@@ -51,6 +51,8 @@ class MachinePoker extends EventEmitter
       @emit 'roundStart', game.status(Game.STATUS.PRIVILEGED)
     game.on 'stateChange', (state) =>
       @emit 'stateChange', game.status(Game.STATUS.PRIVILEGED)
+    game.on 'playerBetStart', (player) =>
+      @emit 'playerBetStart', player
     game.once 'complete', (status) =>
       @emit 'complete', game.status(Game.STATUS.PRIVILEGED)
       @currentRound++
