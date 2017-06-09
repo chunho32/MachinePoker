@@ -33,7 +33,12 @@ class MachinePoker extends EventEmitter
     for event in ['roundStart', 'stateChange', 'complete', 'tournamentComplete', 'betAction', 'playerBetStart']
       @on(event, obs[event].bind(obs)) if obs[event]
 
+  removeObserver: (obs) ->
+    @removeAllListeners()
+    @observers = null
+
   addPlayers: (bots) ->
+    @players = []
     names = []
     for bot in bots
       name = botNameCollision(names, bot.name)
@@ -44,32 +49,37 @@ class MachinePoker extends EventEmitter
     player.on 'betAction', (action, amount, err) =>
       @emit 'betAction', player, action, amount, err
     @players.push(player)
-
+  
   run: ->
-    game = new Game(@players, @betting, @currentRound)
-    game.on 'roundStart', =>
-      @emit 'roundStart', game.status(Game.STATUS.PRIVILEGED)
-    game.on 'stateChange', (state) =>
-      @emit 'stateChange', game.status(Game.STATUS.PRIVILEGED)
-    game.on 'playerBetStart', (player) =>
-      @emit 'playerBetStart', player
-    game.once 'complete', (status) =>
-      @emit 'complete', game.status(Game.STATUS.PRIVILEGED)
-      @currentRound++
-      numPlayer = (@players.filter (p) -> p.chips > 0).length
-      if @currentRound > @maxRounds or numPlayer < 2
-        @emit 'tournamentComplete', @players
-        @_close()
-      else
-        @players = @players.concat(@players.shift())
-        setImmediate => @run()
-    game.run()
+    if @players.length > 1
+      game = new Game(@players, @betting, @currentRound)
+      game.on 'roundStart', =>
+        @emit 'roundStart', game.status(Game.STATUS.PRIVILEGED)
+      game.on 'stateChange', (state) =>
+        @emit 'stateChange', game.status(Game.STATUS.PRIVILEGED)
+      game.on 'playerBetStart', (player) =>
+        @emit 'playerBetStart', player
+      game.once 'complete', (status) =>
+        @emit 'complete', game.status(Game.STATUS.PRIVILEGED)
+        @currentRound++
+        numPlayer = (@players.filter (p) -> p.chips > 0).length
+        if @currentRound > @maxRounds or numPlayer < 2
+          @emit 'tournamentComplete', @players
+          @_close()
+        else
+          setImmediate => @run()
+      game.run()
+    else if @players.length > 0
+    else
+      @_close()
 
   start: ->
     @players.sort ->
       Math.random() > 0.5 # Mix up the players before a tournament
     @run()
-
+    
+  stop: ->
+    
   # Signal when a tournament is over and observers
   # are done. Example, observers may be writing to a stream
   # and not yet finished
