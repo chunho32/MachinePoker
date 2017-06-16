@@ -88,7 +88,7 @@ class MachinePoker extends EventEmitter
   # and not yet finished
   _close: (callback) ->
     waitingOn = 0
-    if observers == null
+    if @observers == null
       return
     for obs in @observers
       if obs['onObserverComplete']
