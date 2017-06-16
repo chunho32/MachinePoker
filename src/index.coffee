@@ -27,6 +27,7 @@ class MachinePoker extends EventEmitter
     @observers = []
     @players = []
     @currentRound = 1
+    @waitingNewRoundTime = 2000;
 
   addObserver: (obs) ->
     @observers.push(obs)
@@ -67,7 +68,9 @@ class MachinePoker extends EventEmitter
           @emit 'tournamentComplete', @players
           @_close()
         else
-          setImmediate => @run()
+          setTimeout =>
+            @run()
+          , @waitingNewRoundTime
       game.run()
     else if @players.length > 0
     else
@@ -85,6 +88,8 @@ class MachinePoker extends EventEmitter
   # and not yet finished
   _close: (callback) ->
     waitingOn = 0
+    if observers == null
+      return
     for obs in @observers
       if obs['onObserverComplete']
         waitingOn++
