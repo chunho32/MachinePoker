@@ -16,8 +16,8 @@ exports.Seat = class SocketSeat extends Seat
 
   setup: (module) ->
     @player = module
-    @playerInfo = module.info || {}
-    @name = @playerInfo.name || "Unnamed"
+    //@playerInfo = module.info || {}
+    @name = module.info.name || "Unnamed"
     @setupFinished()
 
   setupFinished: (err) =>

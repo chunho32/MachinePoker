@@ -44,7 +44,7 @@ class MachinePoker extends EventEmitter
     for bot in bots
       name = botNameCollision(names, bot.name)
       names.push(name)
-      @addPlayer(new Player(bot, @chips, name))
+      @addPlayer(new Player(bot, bot.player.info.chips, name))
 
   addPlayer: (player) ->
     player.on 'betAction', (action, amount, err) =>
